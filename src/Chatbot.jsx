@@ -19,10 +19,15 @@ const Chatbot = () => {
     }, [messages]);
 
     useEffect(() => {
-        const websocketUrl = process.env.REACT_APP_WEBSOCKET_API_URL;
-        if (!websocketUrl) {
+        const websocketBaseUrl = process.env.REACT_APP_WEBSOCKET_API_URL;
+        const urlParams = new URLSearchParams(window.location.pathname);
+        const sessionId = urlParams.get('chat') || '12345';
+
+        if (!websocketBaseUrl) {
             console.error('WebSocket URL is undefined');
         }
+
+        const websocketUrl = `${websocketBaseUrl}/chat/${sessionId}`;
         ws.current = new WebSocket(websocketUrl);
     
         ws.current.onopen = () => {
