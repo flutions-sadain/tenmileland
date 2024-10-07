@@ -7,6 +7,75 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Check, Copy } from 'lucide-react';
 
+
+const sampleMarkdownResponse = `
+# Welcome to the Markdown Chatbot!
+
+This chatbot can render various types of Markdown elements. Here are some examples:
+
+## Text Formatting
+
+You can use **bold**, *italic*, or ~~strikethrough~~ text.
+
+## Lists
+
+Unordered list:
+- Item 1
+- Item 2
+- Item 3
+
+Ordered list:
+1. First item
+2. Second item
+3. Third item
+
+## List
+- Item 1
+- Item 2
+  - Subitem 1
+  - Subitem 2
+
+## Links and Images
+
+Here's a [link to Google](https://www.google.com).
+
+And here's an image:
+
+![Cute cat](https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg)
+
+## Code Blocks
+
+Inline code: \`console.log('Hello, world!')\`
+
+Code block with syntax highlighting:
+
+\`\`\`javascript
+function greet(name) {
+  return \`Hello, \${name}!\`;
+}
+
+console.log(greet('User'));
+\`\`\`
+
+## Tables
+
+| Header 1 | Header 2 | Header 3 |
+|----------|----------|----------|
+| Cell 1   | Cell 2   | Cell 2   |
+| Cell 3   | Cell 4   | Cell 2   |
+
+## Blockquotes
+
+> This is a blockquote.
+> It can span multiple lines.
+
+## Horizontal Rule
+
+---
+
+That's it! Feel free to ask any questions about Markdown or try out different elements.
+`
+
 const CodeBlock = ({ language, value }) => {
     const [copied, setCopied] = useState(false);
 
@@ -156,12 +225,12 @@ const Chatbot = () => {
                             </div>
                         </div>
                     ) : (
-                        <ul className="mt-16 space-y-5 mb-16">
+                        <ul className="mt-10 mb-40">
                             <li className="py-2 sm:py-4">
                                 <div className="max-w-4xl px-4 sm:px-6 lg:px-8 mx-auto">
                                     <div className="max-w-4xl flex gap-x-2 sm:gap-x-4">
                                         <img className="shrink-0 size-[38px] rounded-full" src="/bot-icon.jpg" alt="logo" />
-                                        <div className="grow mt-2 space-y-3 rounded-lg bg-gray-200 px-4 py-2">
+                                        <div className="grow mt-2 space-y-3 rounded-lg bg-gray-100 px-4 py-2">
                                             <p className="text-gray-800">
                                                 How can I help you?
                                             </p>
@@ -172,7 +241,7 @@ const Chatbot = () => {
                             {messages.map((message, index) => (
                                 <li key={index} className="py-2 sm:py-4">
                                     <div className="max-w-4xl px-4 sm:px-6 lg:px-8 mx-auto">
-                                        <div className="max-w-2xl flex gap-x-2 sm:gap-x-4">
+                                        <div className="max-w-4xl flex gap-x-2 sm:gap-x-4">
                                             {message.sender === 'bot' ? (
                                                 <img className="shrink-0 size-[38px] rounded-full" src="/bot-icon.jpg" alt="Bot Icon" />
                                             ) : (
@@ -180,7 +249,7 @@ const Chatbot = () => {
                                                     <span className="text-sm font-medium text-white leading-none">AZ</span>
                                                 </span>
                                             )}
-                                            <div className={`grow space-y-2 px-4 py-2 rounded-lg ${message.sender === 'bot' ? "bg-gray-200" : "bg-green-100"}`}>
+                                            <div className={`grow space-y-2 px-4 py-2 rounded-lg ${message.sender === 'bot' ? "bg-gray-100" : "bg-green-50"}`}>
                                                 <div className="markdown-body">
                                                     {message.type === "image" ?
                                                         <img src={message.content} className="max-w-full h-auto rounded-lg" alt={message.type} />
@@ -206,29 +275,29 @@ const Chatbot = () => {
                                                                     <img src={props.src} className="max-w-full h-auto rounded-lg" alt={props.alt || ''} />
                                                                 ),
                                                                 a: (props) => (
-                                                                    <a {...props} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer" />
+                                                                    <a {...props} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer" ></a>
                                                                 ),
                                                                 h1: (props) => (
-                                                                    <h1 {...props} className="text-2xl font-bold mt-4 mb-2" />
+                                                                    <h1 {...props} className="text-2xl font-bold mt-4 mb-2" ></h1>
                                                                 ),
                                                                 h2: (props) => (
-                                                                    <h2 {...props} className="text-xl font-bold mt-3 mb-2" />
+                                                                    <h2 {...props} className="text-xl font-bold mt-3 mb-2" ></h2>
                                                                 ),
                                                                 h3: (props) => (
-                                                                    <h3 {...props} className="text-lg font-bold mt-2 mb-1" />
+                                                                    <h3 {...props} className="text-lg font-bold mt-2 mb-1" ></h3>
                                                                 ),
-                                                                p: (props) => <p {...props} className="mb-3" />,
-                                                                ul: (props) => <ul {...props} className="list-disc ml-6 mb-2 space-y-2" />,
-                                                                ol: (props) => <ol {...props} className="list-decimal ml-6 mb-2 space-y-2" />,
-                                                                li: (props) => <li {...props} className="mb-1" />,
+                                                                p: (props) => <p {...props} className="mb-3" ></p>,
+                                                                ul: (props) => <ul {...props} className="list-disc ml-6 mb-2 space-y-2" ></ul>,
+                                                                ol: (props) => <ol {...props} className="list-decimal ml-6 mb-2 space-y-2" ></ol>,
+                                                                li: (props) => <li {...props} className="mb-1" ></li>,
                                                                 table: (props) => (
-                                                                    <table {...props} className="border-collapse border rounded-xl border-gray-300 mb-2" />
+                                                                    <table {...props} className="border-collapse border rounded-xl border-gray-300 mb-2" ></table>
                                                                 ),
                                                                 th: (props) => (
-                                                                    <th {...props} className=" px-4 py-2 border-2 bg-gray-100 border-gray-300" />
+                                                                    <th {...props} className=" px-4 py-2 border-2 bg-gray-100 border-gray-300" ></th>
                                                                 ),
                                                                 td: (props) => (
-                                                                    <td {...props} className=" px-4 border-2 py-2 border-gray-300" />
+                                                                    <td {...props} className=" px-4 border-2 py-2 border-gray-300" ></td>
                                                                 ),
                                                             }}
                                                         >
