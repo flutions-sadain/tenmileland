@@ -112,7 +112,7 @@ const Chatbot = () => {
     const [messages, setMessages] = useState([
         // { type: 'message', content: sampleMarkdownResponse }
     ]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [botLoading, setBotLoading] = useState(false);
     const [input, setInput] = useState('');
     const ws = useRef(null);
