@@ -127,8 +127,8 @@ const Chatbot = () => {
     }, [messages]);
 
     useEffect(() => {
-        // const websocketBaseUrl = process.env.REACT_APP_WEBSOCKET_API_URL;
-        const websocketBaseUrl = "ws://localhost:8097/";
+        const websocketBaseUrl = process.env.REACT_APP_WEBSOCKET_API_URL;
+        // const websocketBaseUrl = "ws://localhost:8097/";
         const urlParams = new URLSearchParams(window.location.pathname);
         const sessionId = urlParams.get('chat') || '12345';
 
