@@ -8,73 +8,73 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Check, Copy } from 'lucide-react';
 
 
-const sampleMarkdownResponse = `
-# Welcome to the Markdown Chatbot!
+// const sampleMarkdownResponse = `
+// # Welcome to the Markdown Chatbot!
 
-This chatbot can render various types of Markdown elements. Here are some examples:
+// This chatbot can render various types of Markdown elements. Here are some examples:
 
-## Text Formatting
+// ## Text Formatting
 
-You can use **bold**, *italic*, or ~~strikethrough~~ text.
+// You can use **bold**, *italic*, or ~~strikethrough~~ text.
 
-## Lists
+// ## Lists
 
-Unordered list:
-- Item 1
-- Item 2
-- Item 3
+// Unordered list:
+// - Item 1
+// - Item 2
+// - Item 3
 
-Ordered list:
-1. First item
-2. Second item
-3. Third item
+// Ordered list:
+// 1. First item
+// 2. Second item
+// 3. Third item
 
-## List
-- Item 1
-- Item 2
-  - Subitem 1
-  - Subitem 2
+// ## List
+// - Item 1
+// - Item 2
+//   - Subitem 1
+//   - Subitem 2
 
-## Links and Images
+// ## Links and Images
 
-Here's a [link to Google](https://www.google.com).
+// Here's a [link to Google](https://www.google.com).
 
-And here's an image:
+// And here's an image:
 
-![Cute cat](https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg)
+// ![Cute cat](https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg)
 
-## Code Blocks
+// ## Code Blocks
 
-Inline code: \`console.log('Hello, world!')\`
+// Inline code: \`console.log('Hello, world!')\`
 
-Code block with syntax highlighting:
+// Code block with syntax highlighting:
 
-\`\`\`javascript
-function greet(name) {
-  return \`Hello, \${name}!\`;
-}
+// \`\`\`javascript
+// function greet(name) {
+//   return \`Hello, \${name}!\`;
+// }
 
-console.log(greet('User'));
-\`\`\`
+// console.log(greet('User'));
+// \`\`\`
 
-## Tables
+// ## Tables
 
-| Header 1 | Header 2 | Header 3 |
-|----------|----------|----------|
-| Cell 1   | Cell 2   | Cell 2   |
-| Cell 3   | Cell 4   | Cell 2   |
+// | Header 1 | Header 2 | Header 3 |
+// |----------|----------|----------|
+// | Cell 1   | Cell 2   | Cell 2   |
+// | Cell 3   | Cell 4   | Cell 2   |
 
-## Blockquotes
+// ## Blockquotes
 
-> This is a blockquote.
-> It can span multiple lines.
+// > This is a blockquote.
+// > It can span multiple lines.
 
-## Horizontal Rule
+// ## Horizontal Rule
 
----
+// ---
 
-That's it! Feel free to ask any questions about Markdown or try out different elements.
-`
+// That's it! Feel free to ask any questions about Markdown or try out different elements.
+// `
 
 const CodeBlock = ({ language, value }) => {
     const [copied, setCopied] = useState(false);
