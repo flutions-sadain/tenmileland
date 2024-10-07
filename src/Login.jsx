@@ -51,7 +51,7 @@ const Login = () => {
                                 <div>
                                     <div class="flex justify-between items-center">
                                         <label for="password" class="block text-sm mb-2">Password</label>
-                                        <a class="inline-flex items-center gap-x-1 text-sm text-green-600 decoration-2 hover:underline focus:outline-none focus:underline font-medium" href="#">Forgot password?</a>
+                                        <p class="inline-flex items-center gap-x-1 text-sm text-green-600 decoration-2 hover:underline focus:outline-none focus:underline font-medium">Forgot password?</p>
                                     </div>
                                     <div class="relative">
                                         <input type="password" id="password" name="password" class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-green-500 focus:ring-green-500 disabled:opacity-50 disabled:pointer-events-none" required aria-describedby="password-error" />

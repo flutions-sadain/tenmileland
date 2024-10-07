@@ -110,15 +110,15 @@ const Chatbot = () => {
             <div id="hs-application-sidebar" className="hs-overlay [--auto-close:lg] hs-overlay-open:translate-x-0 -translate-x-full duration-300 transform hidden fixed top-0 start-0 bottom-0 z-[60] w-64 bg-white border-e border-gray-200 overflow-y-auto lg:block lg:translate-x-0 lg:end-auto lg:bottom-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300" role="dialog" tabIndex="-1" aria-label="Sidebar">
                 <nav className="size-full flex flex-col">
                     <div className="flex items-center justify-between pt-4 pe-4 ps-7">
-                        <a className="flex-none focus:outline-none focus:opacity-80" href="#" aria-label="Preline">
+                        {/* <a className="flex-none focus:outline-none focus:opacity-80" href="/" aria-label="Preline"> */}
                             <img className="w-40 h-auto" width="116" height="32" src="/logo.png" alt="logo" />
-                        </a>
+                        {/* </a> */}
                     </div>
 
                     <div className="h-full">
                         <ul className="space-y-1.5 p-4">
                             <li>
-                                <button onClick={handleNewChat} className="flex items-center w-full gap-x-3 py-2 px-3 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100" href="#">
+                                <button onClick={handleNewChat} className="flex items-center w-full gap-x-3 py-2 px-3 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
                                     <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
                                     New chat
                                 </button>
