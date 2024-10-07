@@ -5,8 +5,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Check, Copy } from 'lucide-react';
-
+import { BiCheck, BiCopy } from 'react-icons/bi';
 
 // const sampleMarkdownResponse = `
 // # Welcome to the Markdown Chatbot!
@@ -92,7 +91,7 @@ const CodeBlock = ({ language, value }) => {
                 className="absolute top-2 right-2 text-gray-400 hover:text-white"
                 aria-label={copied ? "Copied" : "Copy to clipboard"}
             >
-                {copied ? <Check size={20} /> : <Copy size={20} />}
+                {copied ? <BiCheck size={20} /> : <BiCopy size={20} />}
             </button>
             <SyntaxHighlighter
                 language={language}
@@ -110,8 +109,10 @@ const CodeBlock = ({ language, value }) => {
 };
 
 const Chatbot = () => {
-    const [messages, setMessages] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [messages, setMessages] = useState([
+        // { type: 'message', content: sampleMarkdownResponse }
+    ]);
+    const [loading, setLoading] = useState(false);
     const [botLoading, setBotLoading] = useState(false);
     const [input, setInput] = useState('');
     const ws = useRef(null);
@@ -126,7 +127,8 @@ const Chatbot = () => {
     }, [messages]);
 
     useEffect(() => {
-        const websocketBaseUrl = process.env.REACT_APP_WEBSOCKET_API_URL;
+        // const websocketBaseUrl = process.env.REACT_APP_WEBSOCKET_API_URL;
+        const websocketBaseUrl = "ws://localhost:8097/";
         const urlParams = new URLSearchParams(window.location.pathname);
         const sessionId = urlParams.get('chat') || '12345';
 
@@ -180,7 +182,7 @@ const Chatbot = () => {
                 <nav className="size-full flex flex-col">
                     <div className="flex items-center justify-between pt-4 pe-4 ps-7">
                         {/* <a className="flex-none focus:outline-none focus:opacity-80" href="/" aria-label="Preline"> */}
-                            <img className="w-40 h-auto" width="116" height="32" src="/logo.png" alt="logo" />
+                        <img className="w-40 h-auto" width="116" height="32" src="/logo.png" alt="logo" />
                         {/* </a> */}
                     </div>
 
@@ -275,29 +277,29 @@ const Chatbot = () => {
                                                                     <img src={props.src} className="max-w-full h-auto rounded-lg" alt={props.alt || ''} />
                                                                 ),
                                                                 a: (props) => (
-                                                                    <a {...props} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer" ></a>
+                                                                    <a href={props.href} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer" >{props.children}</a>
                                                                 ),
                                                                 h1: (props) => (
-                                                                    <h1 {...props} className="text-2xl font-bold mt-4 mb-2" ></h1>
+                                                                    <h1 className="text-2xl font-bold mt-4 mb-2" >{props.children}</h1>
                                                                 ),
                                                                 h2: (props) => (
-                                                                    <h2 {...props} className="text-xl font-bold mt-3 mb-2" ></h2>
+                                                                    <h2 className="text-xl font-bold mt-3 mb-2" >{props.children}</h2>
                                                                 ),
                                                                 h3: (props) => (
-                                                                    <h3 {...props} className="text-lg font-bold mt-2 mb-1" ></h3>
+                                                                    <h3 className="text-lg font-bold mt-2 mb-1" >{props.children}</h3>
                                                                 ),
-                                                                p: (props) => <p {...props} className="mb-3" ></p>,
-                                                                ul: (props) => <ul {...props} className="list-disc ml-6 mb-2 space-y-2" ></ul>,
-                                                                ol: (props) => <ol {...props} className="list-decimal ml-6 mb-2 space-y-2" ></ol>,
-                                                                li: (props) => <li {...props} className="mb-1" ></li>,
+                                                                p: (props) => <p className="mb-3" >{props.children}</p>,
+                                                                ul: (props) => <ul className="list-disc ml-6 mb-2 space-y-2" >{props.children}</ul>,
+                                                                ol: (props) => <ol className="list-decimal ml-6 mb-2 space-y-2" >{props.children}</ol>,
+                                                                li: (props) => <li className="mb-1" >{props.children}</li>,
                                                                 table: (props) => (
-                                                                    <table {...props} className="border-collapse border rounded-xl border-gray-300 mb-2" ></table>
+                                                                    <table className="border-collapse border rounded-xl border-gray-300 mb-2" >{props.children}</table>
                                                                 ),
                                                                 th: (props) => (
-                                                                    <th {...props} className=" px-4 py-2 border-2 bg-gray-100 border-gray-300" ></th>
+                                                                    <th className=" px-4 py-2 border-2 bg-gray-100 border-gray-300" >{props.children}</th>
                                                                 ),
                                                                 td: (props) => (
-                                                                    <td {...props} className=" px-4 border-2 py-2 border-gray-300" ></td>
+                                                                    <td className=" px-4 border-2 py-2 border-gray-300" >{props.children}</td>
                                                                 ),
                                                             }}
                                                         >
