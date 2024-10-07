@@ -1,10 +1,48 @@
 import React, { useEffect, useState, useRef } from 'react';
 import ClipLoader from 'react-spinners/ClipLoader';
 import PulseLoader from 'react-spinners/PulseLoader';
+import ReactMarkdown from "react-markdown";
+import remarkGfm from 'remark-gfm';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Check, Copy } from 'lucide-react';
+
+const CodeBlock = ({ language, value }) => {
+    const [copied, setCopied] = useState(false);
+
+    const copyToClipboard = () => {
+        navigator.clipboard.writeText(value);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    return (
+        <div className="relative">
+            <button
+                onClick={copyToClipboard}
+                className="absolute top-2 right-2 text-gray-400 hover:text-white"
+                aria-label={copied ? "Copied" : "Copy to clipboard"}
+            >
+                {copied ? <Check size={20} /> : <Copy size={20} />}
+            </button>
+            <SyntaxHighlighter
+                language={language}
+                style={vscDarkPlus}
+                customStyle={{
+                    margin: 0,
+                    borderRadius: '0.375rem',
+                    padding: '1rem',
+                }}
+            >
+                {value}
+            </SyntaxHighlighter>
+        </div>
+    );
+};
 
 const Chatbot = () => {
     const [messages, setMessages] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [botLoading, setBotLoading] = useState(false);
     const [input, setInput] = useState('');
     const ws = useRef(null);
@@ -29,14 +67,15 @@ const Chatbot = () => {
 
         const websocketUrl = `${websocketBaseUrl}/chat/${sessionId}`;
         ws.current = new WebSocket(websocketUrl);
-    
+
         ws.current.onopen = () => {
             setLoading(false);
         };
 
         ws.current.onmessage = (event) => {
             setBotLoading(false);
-            setMessages(prevMessages => [...prevMessages, { sender: 'bot', text: event.data }]);
+            const data = JSON.parse(event.data);
+            setMessages(prevMessages => [...prevMessages, { sender: 'bot', ...data }]);
         };
 
         ws.current.onclose = () => {
@@ -50,10 +89,13 @@ const Chatbot = () => {
 
     const handleSendMessage = () => {
         if (input.trim() !== '') {
-            setMessages(prevMessages => [...prevMessages, { sender: 'user', text: input }]);
+            setMessages(prevMessages => [...prevMessages, { sender: 'user', content: input }]);
             setInput('');
             setBotLoading(true);
-            ws.current.send(input);
+            const payload = {
+                "content": input
+            };
+            ws.current.send(JSON.stringify(payload));
         }
     };
 
@@ -107,17 +149,20 @@ const Chatbot = () => {
                     </div>
 
                     {loading ? (
-                        <div className="flex justify-center mt-16">
-                            <ClipLoader color="#36d7b7" loading={loading} />
+                        <div className="flex h-96 justify-center items-center">
+                            <div className="flex flex-col justify-center items-center space-y-2">
+                                <ClipLoader color="#237e1a" loading={loading} />
+                                <p>Configuring the AI model...</p>
+                            </div>
                         </div>
                     ) : (
                         <ul className="mt-16 space-y-5 mb-16">
-                            <li class="py-2 sm:py-4">
-                                <div class="max-w-4xl px-4 sm:px-6 lg:px-8 mx-auto">
-                                    <div class="max-w-2xl flex gap-x-2 sm:gap-x-4">
-                                        <img class="shrink-0 size-[38px] rounded-full" src="/bot-icon.jpg" alt="logo" />
-                                        <div class="grow mt-2 space-y-3">
-                                            <p class="text-gray-800">
+                            <li className="py-2 sm:py-4">
+                                <div className="max-w-4xl px-4 sm:px-6 lg:px-8 mx-auto">
+                                    <div className="max-w-4xl flex gap-x-2 sm:gap-x-4">
+                                        <img className="shrink-0 size-[38px] rounded-full" src="/bot-icon.jpg" alt="logo" />
+                                        <div className="grow mt-2 space-y-3 rounded-lg bg-gray-200 px-4 py-2">
+                                            <p className="text-gray-800">
                                                 How can I help you?
                                             </p>
                                         </div>
@@ -135,10 +180,62 @@ const Chatbot = () => {
                                                     <span className="text-sm font-medium text-white leading-none">AZ</span>
                                                 </span>
                                             )}
-                                            <div className="grow mt-2 space-y-3">
-                                                <p className="text-gray-800">
-                                                    {message.text}
-                                                </p>
+                                            <div className={`grow space-y-2 px-4 py-2 rounded-lg ${message.sender === 'bot' ? "bg-gray-200" : "bg-green-100"}`}>
+                                                <div className="markdown-body">
+                                                    {message.type === "image" ?
+                                                        <img src={message.content} className="max-w-full h-auto rounded-lg" alt={message.type} />
+                                                        :
+                                                        <ReactMarkdown
+                                                            remarkPlugins={[remarkGfm]}
+                                                            components={{
+                                                                code({ className, children, ...props }) {
+                                                                    const match = /language-(\w+)/.exec(className || '')
+                                                                    return match ? (
+                                                                        <CodeBlock
+                                                                            language={match[1]}
+                                                                            value={String(children).replace(/\n$/, '')}
+                                                                            {...props}
+                                                                        />
+                                                                    ) : (
+                                                                        <code className={className} {...props}>
+                                                                            {children}
+                                                                        </code>
+                                                                    )
+                                                                },
+                                                                img: (props) => (
+                                                                    <img src={props.src} className="max-w-full h-auto rounded-lg" alt={props.alt || ''} />
+                                                                ),
+                                                                a: (props) => (
+                                                                    <a {...props} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer" />
+                                                                ),
+                                                                h1: (props) => (
+                                                                    <h1 {...props} className="text-2xl font-bold mt-4 mb-2" />
+                                                                ),
+                                                                h2: (props) => (
+                                                                    <h2 {...props} className="text-xl font-bold mt-3 mb-2" />
+                                                                ),
+                                                                h3: (props) => (
+                                                                    <h3 {...props} className="text-lg font-bold mt-2 mb-1" />
+                                                                ),
+                                                                p: (props) => <p {...props} className="mb-3" />,
+                                                                ul: (props) => <ul {...props} className="list-disc ml-6 mb-2 space-y-2" />,
+                                                                ol: (props) => <ol {...props} className="list-decimal ml-6 mb-2 space-y-2" />,
+                                                                li: (props) => <li {...props} className="mb-1" />,
+                                                                table: (props) => (
+                                                                    <table {...props} className="border-collapse border rounded-xl border-gray-300 mb-2" />
+                                                                ),
+                                                                th: (props) => (
+                                                                    <th {...props} className=" px-4 py-2 border-2 bg-gray-100 border-gray-300" />
+                                                                ),
+                                                                td: (props) => (
+                                                                    <td {...props} className=" px-4 border-2 py-2 border-gray-300" />
+                                                                ),
+                                                            }}
+                                                        >
+                                                            {message.content}
+                                                        </ReactMarkdown>
+                                                    }
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -150,7 +247,7 @@ const Chatbot = () => {
                                         <div className="max-w-2xl flex gap-x-2 sm:gap-x-4">
                                             <img className="shrink-0 size-[38px] rounded-full" src="/bot-icon.jpg" alt="Bot Icon" />
                                             <div className="grow mt-2 space-y-3">
-                                                <PulseLoader color="#237e1a" />
+                                                <PulseLoader size={10} color="#237e1a" />
                                             </div>
                                         </div>
                                     </div>
@@ -170,6 +267,56 @@ const Chatbot = () => {
                     </div>
 
                     <div className="relative">
+                        <div className="flex justify-center gap-3 mb-2 sm:mb-3">
+                            <>
+                                <button
+                                    onClick={() => setInput("How have our overall sales performed in the past quarter compared to the previous year?")}
+                                    type="button"
+                                    className="p-2 inline-flex items-center gap-x-2 text-xs font-medium rounded-lg border-1 border-gray-500 bg-green-100 hover:shadow-md transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none"
+                                >
+                                    <span>
+                                        How have our overall sales performed in the past quarter compared to the previous year?
+                                    </span>
+                                </button>
+                                <button
+                                    onClick={() => setInput("Can you segment our customers based on their purchase behavior and demographics?")}
+                                    type="button"
+                                    className="p-2 inline-flex items-center gap-x-2 text-xs font-medium rounded-lg border-1 border-gray-500 bg-green-100 hover:shadow-md transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none"
+                                >
+                                    <span>
+                                        Can you segment our customers based on their purchase behavior and demographics?
+                                    </span>
+                                </button>
+                                <button
+                                    onClick={() => setInput("Which products have been the top sellers in the past month?")}
+                                    type="button"
+                                    className="p-2 inline-flex items-center gap-x-2 text-xs font-medium rounded-lg border-1 border-gray-500 bg-green-100 hover:shadow-md transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none"
+                                >
+                                    <span>
+                                        Which products have been the top sellers in the past month?
+                                    </span>
+                                </button>
+                                <button
+                                    onClick={() => setInput("How does employee productivity vary across different departments?")}
+                                    type="button"
+                                    className="p-2 inline-flex items-center gap-x-2 text-xs font-medium rounded-lg border-1 border-gray-500 bg-green-100 hover:shadow-md transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none"
+                                >
+                                    <span>
+                                        How does employee productivity vary across different departments?
+                                    </span>
+                                </button>
+                                <button
+                                    onClick={() => setInput("What is the current inventory level for our most popular products?")}
+                                    type="button"
+                                    className="p-2 inline-flex items-center gap-x-2 text-xs font-medium rounded-lg border-1 border-gray-500 bg-green-100 hover:shadow-md transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none"
+                                >
+                                    <span>
+                                        What is the current inventory level for our most popular products?
+                                    </span>
+                                </button>
+
+                            </>
+                        </div>
                         <input
                             className="p-4 pb-12 block w-full bg-gray-100 border-gray-200 rounded-lg text-sm focus:border-green-500 focus:ring-green-500"
                             placeholder="Ask me anything..."
@@ -177,19 +324,19 @@ const Chatbot = () => {
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                         />
-                        <div class="absolute bottom-px inset-x-px p-2 rounded-b-lg bg-gray-100">
-                            <div class="flex justify-between items-center">
-                                <div class="flex items-center">
-                                    <button type="button" class="inline-flex shrink-0 justify-center items-center size-8 rounded-lg text-gray-500 hover:bg-white focus:z-10 focus:outline-none focus:bg-white">
-                                        <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" /></svg>
+                        <div className="absolute bottom-px inset-x-px p-2 rounded-b-lg bg-gray-100">
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center">
+                                    <button type="button" className="inline-flex shrink-0 justify-center items-center size-8 rounded-lg text-gray-500 hover:bg-white focus:z-10 focus:outline-none focus:bg-white">
+                                        <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" /></svg>
                                     </button>
                                 </div>
-                                <div class="flex items-center gap-x-1">
-                                    <button type="button" class="inline-flex shrink-0 justify-center items-center size-8 rounded-lg text-gray-500 hover:bg-white focus:z-10 focus:outline-none focus:bg-white">
-                                        <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" x2="12" y1="19" y2="22" /></svg>
+                                <div className="flex items-center gap-x-1">
+                                    <button type="button" className="inline-flex shrink-0 justify-center items-center size-8 rounded-lg text-gray-500 hover:bg-white focus:z-10 focus:outline-none focus:bg-white">
+                                        <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" x2="12" y1="19" y2="22" /></svg>
                                     </button>
-                                    <button onClick={handleSendMessage} class="inline-flex shrink-0 justify-center items-center size-8 rounded-lg text-white bg-green-600 hover:bg-green-500 focus:z-10 focus:outline-none focus:bg-green-500">
-                                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <button onClick={handleSendMessage} className="inline-flex shrink-0 justify-center items-center size-8 rounded-lg text-white bg-green-600 hover:bg-green-500 focus:z-10 focus:outline-none focus:bg-green-500">
+                                        <svg className="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                             <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z" />
                                         </svg>
                                     </button>
